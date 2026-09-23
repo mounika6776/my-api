@@ -31,15 +31,17 @@ app.get("/", (req, res) => {
 // REGISTER
 app.post("/api/register", async (req, res) => {
   try {
-    const { name, password } = req.body;
+    const { name, password, age, username, branch, college } = req.body;
 
-    if (!name || !password) {
+    if (!name || !password || !age || !username || !branch || !college) {
       return res.status(400).json({
-        message: "Name and password are required"
+        message: "Name, password, age, username, branch and college are required"
       });
     }
 
-    const existingUser = await User.findOne({ name });
+    const existingUser = await User.findOne({
+      $or: [{ name }, { username }]
+    });
 
     if (existingUser) {
       return res.status(400).json({
@@ -51,14 +53,22 @@ app.post("/api/register", async (req, res) => {
 
     const user = await User.create({
       name: name,
-      password: hashedPassword
+      password: hashedPassword,
+      age: age,
+      username: username,
+      branch: branch,
+      college: college
     });
 
     res.status(201).json({
       message: "Registration successful",
       user: {
         id: user._id,
-        name: user.name
+        name: user.name,
+        age: user.age,
+        username: user.username,
+        branch: user.branch,
+        college: user.college
       }
     });
 
@@ -73,19 +83,19 @@ app.post("/api/register", async (req, res) => {
 // LOGIN
 app.post("/api/login", async (req, res) => {
   try {
-    const { name, password } = req.body;
+    const { username, password } = req.body;
 
-    if (!name || !password) {
+    if (!username || !password) {
       return res.status(400).json({
-        message: "Name and password are required"
+        message: "Username and password are required"
       });
     }
 
-    const user = await User.findOne({ name });
+    const user = await User.findOne({ username });
 
     if (!user) {
       return res.status(401).json({
-        message: "Invalid name or password"
+        message: "Invalid username or password"
       });
     }
 
@@ -96,15 +106,20 @@ app.post("/api/login", async (req, res) => {
 
     if (!passwordCorrect) {
       return res.status(401).json({
-        message: "Invalid name or password"
+        message: "Invalid username or password"
       });
     }
 
     res.json({
+      success: true,
       message: "Login successful",
       user: {
         id: user._id,
-        name: user.name
+        name: user.name,
+        username: user.username,
+        age: user.age,
+        branch: user.branch,
+        college: user.college
       }
     });
 

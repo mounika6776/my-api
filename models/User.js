@@ -11,6 +11,27 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true
+    },
+
+    age: {
+      type: Number,
+      required: true
+    },
+
+    username: {
+      type: String,
+      required: true,
+      unique: true
+    },
+
+    branch: {
+      type: String,
+      required: true
+    },
+
+    college: {
+      type: String,
+      required: true
     }
   },
   {
